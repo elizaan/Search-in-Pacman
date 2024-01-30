@@ -91,20 +91,21 @@ def depthFirstSearch(problem):
     # util.raiseNotDefined()
     stack = Stack()
     visited = set()
-    stack.push((problem.getStartState(), []))
+    startState = problem.getStartState()
+    stack.push((startState, []))
 
     while not stack.isEmpty():
-        node, path = stack.pop()
+        currentNode, path = stack.pop()
 
-        if problem.isGoalState(node):
+        if problem.isGoalState(currentNode):
             return path
 
-        if node not in visited:
-            visited.add(node)
-            for successor, action, _ in problem.getSuccessors(node):
+        if currentNode not in visited:
+            visited.add(currentNode)
+            for successor, action, _ in problem.getSuccessors(currentNode):
                 if successor not in visited:
-                    new_path = path + [action]
-                    stack.push((successor, new_path))
+                    newPath = path + [action]
+                    stack.push((successor, newPath))
 
     return []
     
@@ -115,20 +116,21 @@ def breadthFirstSearch(problem):
     # util.raiseNotDefined()
     queue = Queue()
     visited = set()
-    queue.push((problem.getStartState(), []))
+    startState = problem.getStartState()
+    queue.push((startState, []))
 
     while not queue.isEmpty():
-        node, path = queue.pop()
+        currentNode, path = queue.pop()
 
-        if problem.isGoalState(node):
+        if problem.isGoalState(currentNode):
             return path
 
-        if node not in visited:
-            visited.add(node)
-            for successor, action, _ in problem.getSuccessors(node):
+        if currentNode not in visited:
+            visited.add(currentNode)
+            for successor, action, _ in problem.getSuccessors(currentNode):
                 if successor not in visited:
-                    new_path = path + [action]
-                    queue.push((successor, new_path))
+                    newPath = path + [action]
+                    queue.push((successor, newPath))
 
     return []
 
@@ -138,20 +140,21 @@ def uniformCostSearch(problem):
     # util.raiseNotDefined()
     queue = PriorityQueue()
     visited = set()
-    queue.push((problem.getStartState(), [], 0), 0)
+    startState = problem.getStartState()
+    queue.push((startState, [], 0), 0)
 
     while not queue.isEmpty():
-        node, path, cost = queue.pop()
+        currentNode, path, cost = queue.pop()
 
-        if problem.isGoalState(node):
+        if problem.isGoalState(currentNode):
             return path
 
-        if node not in visited:
-            visited.add(node)
-            for successor, action, stepCost in problem.getSuccessors(node):
-                new_cost = cost + stepCost
-                new_path = path + [action]
-                queue.update((successor, new_path, new_cost), new_cost)
+        if currentNode not in visited:
+            visited.add(currentNode)
+            for successor, action, stepCost in problem.getSuccessors(currentNode):
+                updatedCost = cost + stepCost
+                updatedPath = path + [action]
+                queue.update((successor, updatedPath, updatedCost), updatedCost)
 
     return []
 
@@ -169,21 +172,22 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     # util.raiseNotDefined()
     queue = PriorityQueue()
     visited = set()
-    queue.push((problem.getStartState(), [], 0), heuristic(problem.getStartState(), problem))
+    startState = problem.getStartState()
+    queue.push((startState, [], 0), heuristic(startState, problem))
 
     while not queue.isEmpty():
-        node, path, cost = queue.pop()
+        currentNode, path, cost = queue.pop()
 
-        if problem.isGoalState(node):
+        if problem.isGoalState(currentNode):
             return path
 
-        if node not in visited:
-            visited.add(node)
-            for successor, action, stepCost in problem.getSuccessors(node):
-                new_cost = cost + stepCost
-                new_path = path + [action]
-                heuristic_cost = new_cost + heuristic(successor, problem)
-                queue.update((successor, new_path, new_cost), heuristic_cost)
+        if currentNode not in visited:
+            visited.add(currentNode)
+            for successor, action, stepCost in problem.getSuccessors(currentNode):
+                updatedCost = cost + stepCost
+                updatedPath = path + [action]
+                heuristicCost = updatedCost + heuristic(successor, problem)
+                queue.update((successor, updatedPath, updatedCost), heuristicCost)
 
     return []
 

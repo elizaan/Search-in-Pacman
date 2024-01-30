@@ -288,8 +288,14 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        cornerBools = tuple(corner == self.startingPosition for corner in self.corners)
+        cornerBools = []
+        for corner in self.corners:
+            isAtCorner = (corner == self.startingPosition)
+            cornerBools.append(isAtCorner)
+        cornerBools = tuple(cornerBools)
+
         self.startState = (self.startingPosition, cornerBools)
+        print(self.startState)
 
     def getStartState(self):
         """
@@ -306,6 +312,7 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
         # util.raiseNotDefined()
+        # Check if all conditions in the state's second element are met (True)
         return all(state[1])
 
     def getSuccessors(self, state):
@@ -372,26 +379,26 @@ def cornersHeuristic(state, problem):
 
     "*** YOUR CODE HERE ***"
 
-    current_position, visited_corners = state
-    unvisited_corners = [corner for corner, visited in zip(corners, visited_corners) if not visited]
+    currentPosition, currentBools = state
+    unvisitedCorners = [corner for corner, visited in zip(corners, currentBools) if not visited]
 
-    if not unvisited_corners:
+    if not unvisitedCorners:
         return 0
     
-    total_cost = 0
-    current_pos = current_position
+    totalCost = 0
+    current_pos = currentPosition
 
-    while unvisited_corners:
+    while unvisitedCorners:
         # Finding the nearest unvisited corner and its distance
-        distances = [(corner, util.manhattanDistance(current_pos, corner)) for corner in unvisited_corners]
-        nearest_corner, nearest_dist = min(distances, key=lambda x: x[1])
+        distances = [(corner, util.manhattanDistance(current_pos, corner)) for corner in unvisitedCorners]
+        nearestCorner, nearestDist = min(distances, key=lambda x: x[1])
 
         # Adding this distance to the total cost
-        total_cost += nearest_dist
-        current_pos = nearest_corner
-        unvisited_corners.remove(nearest_corner)
+        totalCost += nearestDist
+        current_pos = nearestCorner
+        unvisitedCorners.remove(nearestCorner)
 
-    return total_cost
+    return totalCost
 
     # return 0 # Default to trivial solution
 
@@ -488,16 +495,23 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
     foodList = foodGrid.asList()
+    
 
     if not foodList:
         return 0
     
-    nearest_food_dist = min(util.manhattanDistance(position, food) for food in foodList)
+    # nearest_foodDist = min(util.manhattanDistance(position, food) for food in foodList)
+    nearest_foodDist = min(mazeDistance(position, food, problem.startingGameState) for food in foodList)
 
-    furthest_food_distance = max(util.manhattanDistance(nearest_food, food) for food in foodList for nearest_food in foodList)
+    # Calculating maze distances between all pairs of food items
+    mazeDistances = []
+    for food1 in foodList:
+        for food2 in foodList:
+            distance = mazeDistance(food1, food2, problem.startingGameState)
+            mazeDistances.append(distance)
+    furthest_foodDist = max(mazeDistances)
 
-    return nearest_food_dist + furthest_food_distance
-
+    return nearest_foodDist + furthest_foodDist
 
     # return 0
 
@@ -530,7 +544,8 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+        return search.astar(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -564,9 +579,9 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x,y = state
-
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.food[x][y]
+        # util.raiseNotDefined()
 
 def mazeDistance(point1, point2, gameState):
     """
